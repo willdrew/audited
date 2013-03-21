@@ -12,4 +12,18 @@ end
 
 Audited.audit_class = Audited::Adapters::ActiveRecord::Audit
 
-require 'audited/sweeper'
+module Audited
+  class AuditedRailtie < ::Rails::Railtie
+    config.after_initialize do
+      if defined? ActiveModel::Observer
+        require 'audited/sweeper'
+      else
+        if Rails::VERSION::MAJOR >= 4
+          raise "Please install gem 'rails-observers', '~> 0.1.0'"
+        else
+          raise "'ActiveModel::Observer' not defined!"
+        end
+      end
+    end
+  end
+end
